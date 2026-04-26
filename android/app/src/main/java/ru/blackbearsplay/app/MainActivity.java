@@ -1,0 +1,5 @@
+package ru.blackbearsplay.app;
+
+import com.getcapacitor.BridgeActivity;
+
+public class MainActivity extends BridgeActivity {}

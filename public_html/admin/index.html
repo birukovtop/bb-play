@@ -1,0 +1,2704 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админ-панель — BlackBears Play</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0e1a;
+            --bg-secondary: #14192d;
+            --bg-card: #1a1f3a;
+            --bg-hover: #252b4d;
+            --gold: #d4af37;
+            --gold-light: #b8942f;
+            --gold-bg: rgba(212, 175, 55, 0.1);
+            --text-primary: #e0d5c1;
+            --text-secondary: #888;
+            --text-muted: #666;
+            --success: #4caf50;
+            --danger: #f44336;
+            --warning: #ff9800;
+            --info: #4fc3f7;
+            --purple: #9c27b0;
+            --border: #333;
+            --border-gold: rgba(212, 175, 55, 0.3);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 260px;
+            background: var(--bg-secondary);
+            border-right: 2px solid var(--border-gold);
+            padding: 20px 0;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-header h2 {
+            color: var(--gold);
+            font-size: 1.3em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-header p {
+            color: var(--text-secondary);
+            font-size: 0.8em;
+            margin-top: 5px;
+        }
+
+        .nav-section {
+            margin-bottom: 20px;
+        }
+
+        .nav-section-title {
+            padding: 8px 20px;
+            color: var(--text-secondary);
+            font-size: 0.75em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 20px;
+            color: var(--text-primary);
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: var(--gold-bg);
+            border-left-color: var(--gold);
+        }
+
+        .nav-item.active {
+            background: var(--gold-bg);
+            border-left-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .nav-item .icon {
+            font-size: 1.2em;
+            width: 24px;
+            text-align: center;
+        }
+
+        .nav-item .label {
+            font-size: 0.9em;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            margin-left: 260px;
+            padding: 30px;
+            min-height: 100vh;
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-header h1 {
+            color: var(--gold);
+            font-size: 2em;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .page-header p {
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        /* ===== TABS ===== */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* ===== STATS GRID ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            border-color: var(--border-gold);
+            transform: translateY(-2px);
+        }
+
+        .stat-card .stat-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .stat-value {
+            font-size: 2.2em;
+            font-weight: bold;
+            color: var(--gold);
+        }
+
+        .stat-card .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.85em;
+            margin-top: 5px;
+        }
+
+        /* ===== CARDS ===== */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            padding: 15px 20px;
+            background: var(--gold-bg);
+            border-bottom: 1px solid var(--border-gold);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .card-header h3 {
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        /* ===== CONTROLS ===== */
+        .controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .control-group label {
+            font-size: 0.8em;
+            color: var(--text-secondary);
+        }
+
+        select, input[type="text"], input[type="number"], input[type="date"], input[type="time"], input[type="email"], input[type="password"] {
+            padding: 10px 15px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 0.9em;
+            min-width: 150px;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--gold);
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+            color: var(--bg-primary);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--bg-hover);
+            color: var(--gold);
+            border: 1px solid var(--gold);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: var(--gold-bg);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.8em;
+        }
+
+        /* ===== TABLES ===== */
+        .table-wrapper {
+            overflow-x: auto;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: var(--bg-hover);
+            padding: 12px 15px;
+            text-align: left;
+            color: var(--gold);
+            font-weight: 500;
+            font-size: 0.85em;
+            border-bottom: 2px solid var(--border-gold);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        td {
+            padding: 10px 15px;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.85em;
+        }
+
+        tr:hover {
+            background: var(--gold-bg);
+        }
+
+        tr.selected {
+            background: rgba(212, 175, 55, 0.2);
+            border-left: 3px solid var(--gold);
+        }
+
+        input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: var(--gold);
+        }
+
+        /* ===== BADGES ===== */
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: rgba(76, 175, 80, 0.2);
+            color: var(--success);
+        }
+
+        .badge-danger {
+            background: rgba(244, 67, 54, 0.2);
+            color: var(--danger);
+        }
+
+        .badge-warning {
+            background: rgba(255, 152, 0, 0.2);
+            color: var(--warning);
+        }
+
+        .badge-info {
+            background: rgba(79, 195, 247, 0.2);
+            color: var(--info);
+        }
+
+        .group-tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 600;
+            background: rgba(156, 39, 176, 0.15);
+            color: var(--purple);
+        }
+
+        /* ===== PRICE ROW CLICKABLE ===== */
+        .price-row-clickable {
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .price-row-clickable:hover {
+            background: rgba(212, 175, 55, 0.15) !important;
+        }
+
+        /* ===== JSON DISPLAY ===== */
+        .json-display {
+            background: #1e1e1e;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 20px;
+            font-family: 'Courier New', Consolas, monospace;
+            font-size: 0.85em;
+            line-height: 1.6;
+            color: #d4d4d4;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .json-key { color: #9cdcfe; }
+        .json-string { color: #ce9178; }
+        .json-number { color: #b5cea8; }
+        .json-boolean { color: #569cd6; }
+        .json-null { color: #569cd6; }
+
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--bg-card);
+            border: 2px solid var(--gold);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 15px 20px;
+            background: var(--gold-bg);
+            border-bottom: 1px solid var(--border-gold);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            color: var(--gold);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.5em;
+            cursor: pointer;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        /* ===== FORM ===== */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--text-secondary);
+            font-size: 0.85em;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-primary);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        /* ===== LOG BOX ===== */
+        .log-box {
+            background: #000;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.8em;
+            margin-top: 20px;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 3px 0;
+        }
+
+        .log-entry.info { color: var(--info); }
+        .log-entry.success { color: var(--success); }
+        .log-entry.error { color: var(--danger); }
+        .log-entry.warn { color: var(--warning); }
+
+        /* ===== PC GRID ===== */
+        .pc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+        }
+
+        .pc-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .pc-card.available {
+            border-color: var(--success);
+        }
+
+        .pc-card.occupied {
+            border-color: var(--danger);
+            opacity: 0.7;
+        }
+
+        .pc-card.disabled {
+            border-color: var(--text-muted);
+            opacity: 0.4;
+        }
+
+        .pc-card .pc-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .pc-card .pc-status {
+            font-size: 0.75em;
+            color: var(--text-secondary);
+        }
+
+        /* ===== LOADING ===== */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            color: var(--gold);
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border-gold);
+            border-top-color: var(--gold);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state-icon {
+            font-size: 4em;
+            margin-bottom: 15px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 60px;
+            }
+
+            .sidebar-header h2 span,
+            .sidebar-header p,
+            .nav-section-title,
+            .nav-item .label {
+                display: none;
+            }
+
+            .nav-item {
+                justify-content: center;
+                padding: 15px;
+            }
+
+            .main-content {
+                margin-left: 60px;
+                padding: 15px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+
+        /* ===== ACTION BUTTONS ===== */
+        .action-btns {
+            display: flex;
+            gap: 5px;
+        }
+
+        /* ===== USER DETAIL ===== */
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .detail-item {
+            background: var(--bg-primary);
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        .detail-item .detail-label {
+            font-size: 0.75em;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .detail-item .detail-value {
+            font-size: 1em;
+            color: var(--text-primary);
+        }
+
+        /* ===== SEARCH ===== */
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        /* ===== CLUB SELECTOR ===== */
+        .club-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .club-btn {
+            padding: 10px 20px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .club-btn.active {
+            border-color: var(--gold);
+            background: var(--gold-bg);
+            color: var(--gold);
+        }
+
+        /* ===== RANKING ===== */
+        .ranking-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px;
+            background: var(--bg-primary);
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .ranking-number {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--gold);
+            width: 40px;
+            text-align: center;
+        }
+
+        .ranking-info {
+            flex: 1;
+        }
+
+        .ranking-name {
+            font-weight: 500;
+        }
+
+        .ranking-stats {
+            font-size: 0.8em;
+            color: var(--text-secondary);
+        }
+
+        /* ===== TIMELINE ===== */
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: var(--bg-primary);
+            border-radius: 8px;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -25px;
+            top: 20px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--gold);
+            border: 2px solid var(--bg-card);
+        }
+
+        .timeline-date {
+            font-size: 0.75em;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>🐻 <span>Admin Panel</span></h2>
+            <p>BlackBears Play</p>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Главное</div>
+            <a class="nav-item active" data-tab="dashboard">
+                <span class="icon">📊</span>
+                <span class="label">Дашборд</span>
+            </a>
+            <a class="nav-item" data-tab="users">
+                <span class="icon">👥</span>
+                <span class="label">Пользователи</span>
+            </a>
+            <a class="nav-item" data-tab="bookings">
+                <span class="icon">🎮</span>
+                <span class="label">Бронирования</span>
+            </a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Управление</div>
+            <a class="nav-item" data-tab="orders">
+                <span class="icon">🧾</span>
+                <span class="label">Заказы</span>
+            </a>
+            <a class="nav-item" data-tab="pcs">
+                <span class="icon">💻</span>
+                <span class="label">ПК и залы</span>
+            </a>
+            <a class="nav-item" data-tab="prices">
+                <span class="icon">💰</span>
+                <span class="label">Тарифы</span>
+            </a>
+            <a class="nav-item" data-tab="cafes">
+                <span class="icon">🏢</span>
+                <span class="label">Клубы</span>
+            </a>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Аналитика</div>
+            <a class="nav-item" data-tab="ranking">
+                <span class="icon">🏆</span>
+                <span class="label">Рейтинг</span>
+            </a>
+            <a class="nav-item" data-tab="analytics">
+                <span class="icon">📈</span>
+                <span class="label">Аналитика</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <!-- ==================== DASHBOARD ==================== -->
+        <div class="tab-content active" id="tab-dashboard">
+            <div class="page-header">
+                <h1>📊 Дашборд</h1>
+                <p>Общая статистика по клубам</p>
+            </div>
+
+            <div class="club-selector" id="dashboard-club-selector"></div>
+
+            <div class="stats-grid" id="dashboard-stats"></div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>📋 Активные бронирования</h3>
+                </div>
+                <div class="card-body" id="dashboard-bookings">
+                    <div class="loading"><span class="spinner"></span> Загрузка...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== USERS ==================== -->
+        <div class="tab-content" id="tab-users">
+            <div class="page-header">
+                <h1>👥 Пользователи</h1>
+                <p>Управление пользователями клуба</p>
+            </div>
+
+            <div class="controls">
+                <div class="control-group">
+                    <label>Клуб</label>
+                    <select id="users-club"></select>
+                </div>
+                <input type="text" class="search-input" id="users-search" placeholder="🔍 Поиск по логину, имени, телефону...">
+                <button class="btn btn-primary" onclick="loadUsers()">🔄 Загрузить</button>
+                <button class="btn btn-secondary" onclick="showCreateUserModal()">➕ Создать</button>
+                <button class="btn btn-secondary" onclick="exportUsers()">📥 Экспорт CSV</button>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>Список пользователей</h3>
+                    <span id="users-count"></span>
+                </div>
+                <div class="card-body">
+                    <div class="table-wrapper">
+                        <table id="users-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Логин</th>
+                                    <th>Имя</th>
+                                    <th>Телефон</th>
+                                    <th>Email</th>
+                                    <th>Баланс</th>
+                                    <th>Бонусы</th>
+                                    <th>Очки</th>
+                                    <th>Скидка</th>
+                                    <th>Вериф.</th>
+                                    <th>Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== BOOKINGS ==================== -->
+        <div class="tab-content" id="tab-bookings">
+            <div class="page-header">
+                <h1>🎮 Бронирования</h1>
+                <p>Все активные бронирования по клубам</p>
+            </div>
+
+            <div class="controls">
+                <div class="control-group">
+                    <label>Клуб</label>
+                    <select id="bookings-club"></select>
+                </div>
+                <input type="text" class="search-input" id="bookings-search" placeholder="🔍 Поиск по нику, ПК...">
+                <button class="btn btn-primary" onclick="loadBookings()">🔄 Загрузить</button>
+            </div>
+
+            <!-- Массовые действия -->
+            <div class="card" id="bookings-bulk-actions" style="display: none;">
+                <div class="card-header">
+                    <h3>⚡ Массовые действия</h3>
+                    <span id="bookings-selected-count"></span>
+                </div>
+                <div class="card-body">
+                    <div class="controls">
+                        <button class="btn btn-danger" onclick="massCancelSelected()">❌ Отменить выбранные</button>
+                        <button class="btn btn-secondary" onclick="selectAllBookings(true)">☑ Выбрать все</button>
+                        <button class="btn btn-secondary" onclick="selectAllBookings(false)">☐ Снять все</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>Список бронирований</h3>
+                    <div style="display:flex;gap:10px;align-items:center;">
+                        <span id="bookings-count"></span>
+                        <button class="btn btn-success" onclick="showMassBookingModal()">➕ Массовое бронирование</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-wrapper">
+                        <table id="bookings-table">
+                            <thead>
+                                <tr>
+                                    <th style="width:40px;"><input type="checkbox" id="bookings-select-all" onchange="selectAllBookings(this.checked)"></th>
+                                    <th>ПК</th>
+                                    <th>Пользователь</th>
+                                    <th>Начало</th>
+                                    <th>Окончание</th>
+                                    <th>Длительность</th>
+                                    <th>Зона</th>
+                                    <th>member_offer_id</th>
+                                    <th>Статус</th>
+                                    <th>Действия</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bookings-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== PCS ==================== -->
+        <div class="tab-content" id="tab-pcs">
+            <div class="page-header">
+                <h1>💻 ПК и залы</h1>
+                <p>Статус компьютеров и структура залов</p>
+            </div>
+
+            <div class="controls">
+                <div class="control-group">
+                    <label>Клуб</label>
+                    <select id="pcs-club"></select>
+                </div>
+                <button class="btn btn-primary" onclick="loadPcs()">🔄 Загрузить</button>
+            </div>
+
+            <div id="pcs-rooms"></div>
+        </div>
+
+        <!-- ==================== PRICES ==================== -->
+        <div class="tab-content" id="tab-prices">
+            <div class="page-header">
+                <h1>💰 Тарифы</h1>
+                <p>Тарифы и пакеты клуба</p>
+            </div>
+
+            <div class="controls">
+                <div class="control-group">
+                    <label>Клуб</label>
+                    <select id="prices-club"></select>
+                </div>
+                <div class="control-group">
+                    <label>Длительность (мин)</label>
+                    <input type="number" id="prices-mins" value="60" min="30" step="30">
+                </div>
+                <button class="btn btn-primary" onclick="loadPrices()">🔄 Загрузить</button>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>Почасовые тарифы</h3>
+                    <span id="prices-info"></span>
+                </div>
+                <div class="card-body">
+                    <div id="prices-info-bar" style="margin-bottom: 15px; padding: 10px; background: var(--bg-primary); border-radius: 6px; font-size: 0.85em; color: var(--text-secondary);">
+                        Шаг бронирования: <strong id="prices-step">-</strong> | 
+                        Тех. перерыв: <strong id="prices-break">-</strong> |
+                        Зоны: <strong id="prices-zones">-</strong>
+                    </div>
+                    <div id="prices-note" style="margin-bottom: 15px; padding: 10px; background: rgba(79, 195, 247, 0.1); border-left: 3px solid var(--info); border-radius: 4px; font-size: 0.85em; color: var(--info);">
+                        ℹ️ <strong>Примечание:</strong> Для этого клуба настроен общий тариф для всех зон. 
+                        Цены одинаковые для BootCamp, GameZone и VIP.
+                    </div>
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Тариф</th>
+                                    <th>Зона</th>
+                                    <th>Длительность</th>
+                                    <th>Цена/час</th>
+                                    <th>Итого</th>
+                                    <th>₽/час факт</th>
+                                </tr>
+                            </thead>
+                            <tbody id="prices-prices-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header"><h3>Пакеты</h3><span id="packages-info"></span></div>
+                <div class="card-body">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Пакет</th>
+                                    <th>Зона</th>
+                                    <th>Длительность</th>
+                                    <th>Время действия</th>
+                                    <th>Цена</th>
+                                    <th>₽/час</th>
+                                </tr>
+                            </thead>
+                            <tbody id="prices-products-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== CAFES ==================== -->
+        <div class="tab-content" id="tab-cafes">
+            <div class="page-header">
+                <h1>🏢 Клубы</h1>
+                <p>Список клубов и их статистика</p>
+            </div>
+
+            <button class="btn btn-primary" onclick="loadCafes()">🔄 Обновить</button>
+
+            <div class="stats-grid" id="cafes-stats"></div>
+        </div>
+
+        <!-- ==================== RANKING ==================== -->
+        <div class="tab-content" id="tab-ranking">
+            <div class="page-header">
+                <h1>🏆 Рейтинг игроков</h1>
+                <p>Топ игроков по активности</p>
+            </div>
+
+            <div class="controls">
+                <div class="control-group">
+                    <label>Клуб</label>
+                    <select id="ranking-club"></select>
+                </div>
+                <div class="control-group">
+                    <label>Страница</label>
+                    <input type="number" id="ranking-page" value="1" min="1">
+                </div>
+                <button class="btn btn-primary" onclick="loadRanking()">🔄 Загрузить</button>
+            </div>
+
+            <div id="ranking-list"></div>
+        </div>
+
+        <!-- ==================== ANALYTICS ==================== -->
+        <div class="tab-content" id="tab-analytics">
+            <div class="page-header">
+                <h1>📈 Аналитика</h1>
+                <p>Детальная аналитика по пользователю</p>
+            </div>
+
+            <div class="controls">
+                <div class="control-group">
+                    <label>Клуб</label>
+                    <select id="analytics-club"></select>
+                </div>
+                <div class="control-group">
+                    <label>Member ID</label>
+                    <input type="text" id="analytics-member-id" placeholder="312...">
+                </div>
+                <button class="btn btn-primary" onclick="loadAnalytics()">🔍 Найти</button>
+            </div>
+
+            <div id="analytics-content">
+                <div class="empty-state">
+                    <div class="empty-state-icon">📊</div>
+                    <p>Введите Member ID для просмотра аналитики</p>
+                </div>
+            </div>
+        </div>
+        <div class="tab-content" id="tab-orders">
+            <div class="page-header">
+                <h1>Заказы</h1>
+                <p>Еда и напитки из клиентского приложения</p>
+            </div>
+
+            <div class="controls">
+                <button class="btn btn-secondary" onclick="loadFoodOrders('active')">Активные</button>
+                <button class="btn btn-secondary" onclick="loadFoodOrders('history')">Завершенные</button>
+                <button class="btn btn-primary" onclick="loadFoodOrders(currentFoodOrderGroup)">Обновить</button>
+            </div>
+
+            <div id="food-orders-list"></div>
+        </div>
+    </main>
+
+    <!-- ===== МОДАЛКА: Пользователь ===== -->
+    <div class="modal-overlay" id="user-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="user-modal-title">Пользователь</h3>
+                <button class="modal-close" onclick="closeModal('user-modal')">&times;</button>
+            </div>
+            <div class="modal-body" id="user-modal-body"></div>
+            <div class="modal-footer" id="user-modal-footer"></div>
+        </div>
+    </div>
+
+    <!-- ===== МОДАЛКА: Создать пользователя ===== -->
+    <div class="modal-overlay" id="create-user-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>➕ Создать пользователя</h3>
+                <button class="modal-close" onclick="closeModal('create-user-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Логин *</label>
+                        <input type="text" id="new-login" placeholder="newuser">
+                    </div>
+                    <div class="form-group">
+                        <label>Имя *</label>
+                        <input type="text" id="new-name" placeholder="User Name">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Телефон *</label>
+                        <input type="text" id="new-phone" placeholder="+79537171718">
+                    </div>
+                    <div class="form-group">
+                        <label>Email *</label>
+                        <input type="email" id="new-email" placeholder="user@mail.ru">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Пароль *</label>
+                    <input type="password" id="new-password" placeholder="Минимум 6 символов">
+                </div>
+                <div class="form-group">
+                    <label>Клуб</label>
+                    <select id="new-club"></select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('create-user-modal')">Отмена</button>
+                <button class="btn btn-primary" onclick="createUser()">Создать</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== МОДАЛКА: Пополнение ===== -->
+    <div class="modal-overlay" id="topup-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>💰 Пополнение баланса</h3>
+                <button class="modal-close" onclick="closeModal('topup-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Пользователь</label>
+                    <input type="text" id="topup-user" readonly>
+                </div>
+                <div class="form-group">
+                    <label>Сумма пополнения (₽)</label>
+                    <input type="number" id="topup-amount" value="500" min="10" max="100000">
+                </div>
+                <input type="hidden" id="topup-member-id">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('topup-modal')">Отмена</button>
+                <button class="btn btn-success" onclick="topupUser()">Пополнить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== МОДАЛКА: Массовое бронирование ===== -->
+    <div class="modal-overlay" id="mass-booking-modal">
+        <div class="modal" style="max-width: 800px;">
+            <div class="modal-header">
+                <h3>➕ Массовое бронирование</h3>
+                <button class="modal-close" onclick="closeModal('mass-booking-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Клуб</label>
+                        <select id="mass-club"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>ПК (через запятую)</label>
+                        <input type="text" id="mass-pcs" placeholder="PC09,PC10,PC11">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Дата начала</label>
+                        <input type="date" id="mass-date">
+                    </div>
+                    <div class="form-group">
+                        <label>Время начала</label>
+                        <input type="time" id="mass-time" value="18:00">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Длительность (мин)</label>
+                        <input type="number" id="mass-duration" value="60" min="30" step="30">
+                    </div>
+                    <div class="form-group">
+                        <label>Логин пользователя</label>
+                        <input type="text" id="mass-login" placeholder="test1">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Или Member ID (через запятую для нескольких)</label>
+                    <input type="text" id="mass-member-ids" placeholder="312079494943 или 312079494943,312079494945">
+                </div>
+                <div class="form-group">
+                    <label>Поиск пользователей (введите ник — нажмите "Найти")</label>
+                    <div style="display:flex;gap:10px;">
+                        <input type="text" id="mass-user-search" placeholder="test1">
+                        <button class="btn btn-secondary" onclick="searchMassBookingUsers()">🔍 Найти</button>
+                    </div>
+                </div>
+                <div id="mass-user-results" style="max-height:200px;overflow-y:auto;margin-top:10px;"></div>
+                <div id="mass-selected-users" style="margin-top:10px;"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('mass-booking-modal')">Отмена</button>
+                <button class="btn btn-primary" onclick="executeMassBooking()">🎮 Забронировать</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== МОДАЛКА: Лог массовых операций ===== -->
+    <div class="modal-overlay" id="mass-log-modal">
+        <div class="modal" style="max-width: 700px;">
+            <div class="modal-header">
+                <h3>📋 Лог операций</h3>
+                <button class="modal-close" onclick="closeModal('mass-log-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="mass-log-content" style="max-height:400px;overflow-y:auto;font-family:monospace;font-size:0.85em;background:#000;padding:15px;border-radius:6px;"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('mass-log-modal')">Закрыть</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== МОДАЛКА: Детали тарифа ===== -->
+    <div class="modal-overlay" id="price-detail-modal">
+        <div class="modal" style="max-width: 700px;">
+            <div class="modal-header">
+                <h3 id="price-detail-title">💰 Детали тарифа</h3>
+                <button class="modal-close" onclick="closeModal('price-detail-modal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="price-detail-content" class="json-display"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('price-detail-modal')">Закрыть</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== ЛОГ ===== -->
+    <div class="log-box" id="log-box">
+        <div class="log-entry info">⏳ Админ-панель загружена</div>
+    </div>
+
+    <script>
+        // ==================== CONFIG ====================
+        const API_URL = window.BB_APP_CONFIG?.adminApi || '/admin/api/admin-api.php';
+        const CLUBS = [
+            { id: '74922', name: 'Советская 121' },
+            { id: '76301', name: 'Астраханская 2В' },
+            { id: '87375', name: 'Медвежья 1' }
+        ];
+
+        let currentClub = CLUBS[0].id;
+        let allUsers = [];
+
+        // ==================== INIT ====================
+        document.addEventListener('DOMContentLoaded', async () => {
+            console.log('🚀 Admin page loaded');
+            try {
+                initTabs();
+                initClubSelectors();
+                
+                // Тест API при загрузке
+                try {
+                    console.log('📡 Testing API connection...');
+                    const testResult = await apiCall('get_cafes');
+                    console.log('✅ API connected:', testResult);
+                    addLog('✅ API подключено', 'success');
+                } catch (e) {
+                    console.error('❌ API connection failed:', e);
+                    addLog(`❌ Ошибка API: ${e.message}`, 'error');
+                    // Не блокируем загрузку из-за API
+                }
+                
+                console.log('📊 Loading dashboard...');
+                await loadDashboard();
+                addLog('✅ Админ-панель инициализирована', 'success');
+            } catch (error) {
+                console.error('❌ Init error:', error);
+                addLog(`❌ Критическая ошибка: ${error.message}`, 'error');
+            }
+        });
+
+        // ==================== TABS ====================
+        function initTabs() {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const tab = item.dataset.tab;
+                    console.log('📑 Switching to tab:', tab);
+                    switchTab(tab);
+                });
+            });
+        }
+
+        function switchTab(tabName) {
+            console.log('🔄 Switching to:', tabName);
+            // Update nav
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+            document.querySelector(`.nav-item[data-tab="${tabName}"]`)?.classList.add('active');
+
+            // Update content
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            const tabEl = document.getElementById(`tab-${tabName}`);
+            if (tabEl) {
+                tabEl.classList.add('active');
+                console.log('✅ Tab activated:', tabName);
+            } else {
+                console.error('❌ Tab not found:', tabName);
+            }
+
+            // Load data for tab
+            switch (tabName) {
+                case 'dashboard': loadDashboard(); break;
+                case 'users': loadUsers(); break;
+                case 'bookings': loadBookings(); break;
+                case 'pcs': loadPcs(); break;
+                case 'prices': loadPrices(); break;
+                case 'cafes': loadCafes(); break;
+                case 'ranking': loadRanking(); break;
+                case 'orders': loadFoodOrders(); break;
+            }
+        }
+
+        // ==================== CLUB SELECTORS ====================
+        function initClubSelectors() {
+            const selectors = [
+                'users-club', 'bookings-club', 'pcs-club', 'prices-club',
+                'ranking-club', 'analytics-club', 'new-club', 'mass-club'
+            ];
+
+            selectors.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.innerHTML = CLUBS.map(c =>
+                        `<option value="${c.id}" ${c.id === currentClub ? 'selected' : ''}>${c.name}</option>`
+                    ).join('');
+
+                    el.addEventListener('change', () => {
+                        currentClub = el.value;
+                        updateDashboardClubSelector();
+                    });
+                }
+            });
+
+            updateDashboardClubSelector();
+        }
+
+        function updateDashboardClubSelector() {
+            const el = document.getElementById('dashboard-club-selector');
+            if (el) {
+                el.innerHTML = CLUBS.map(c =>
+                    `<button class="club-btn ${c.id === currentClub ? 'active' : ''}" onclick="switchDashboardClub('${c.id}')">${c.name}</button>`
+                ).join('');
+            }
+        }
+
+        function switchDashboardClub(clubId) {
+            currentClub = clubId;
+            updateDashboardClubSelector();
+            document.querySelectorAll('select').forEach(s => s.value = clubId);
+            loadDashboard();
+        }
+
+        async function loadFoodOrders() {
+            const box = document.getElementById('food-orders-list');
+            if (!box) return;
+            box.innerHTML = '<div class="loading">Загрузка заказов...</div>';
+            try {
+                const data = await apiCall('get_food_orders');
+                const orders = data.data || [];
+                if (!orders.length) {
+                    box.innerHTML = '<div class="empty-state"><p>Активных заказов пока нет</p></div>';
+                    return;
+                }
+                box.innerHTML = orders.map(order => `
+                    <div class="card" style="margin-bottom:12px;">
+                        <div style="display:flex;justify-content:space-between;gap:16px;align-items:flex-start;">
+                            <div>
+                                <h3>#${order.id} ${order.table_name || 'Стол не указан'}</h3>
+                                <p>${order.user_login} • ${order.fulfillment_type === 'delivery' ? 'Доставка за ПК' : 'Самовывоз'} • ${order.payment_method}</p>
+                                <p>${order.items_summary || ''}</p>
+                                <p><b>${order.total}₽</b> • ${order.payment_status} • ${order.status}</p>
+                                <p>Код: <b>${order.confirmation_code}</b></p>
+                            </div>
+                            <div style="display:grid;gap:8px;min-width:160px;">
+                                <input id="food-code-${order.id}" placeholder="Код или QR">
+                                <button class="btn btn-secondary" onclick="verifyFoodOrder(${order.id})">Проверить код</button>
+                                <button class="btn btn-primary" onclick="completeFoodOrder(${order.id})">Завершить</button>
+                                <button class="btn btn-danger" onclick="cancelFoodOrder(${order.id})">Отменить</button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                box.innerHTML = `<div class="error">${e.message}</div>`;
+            }
+        }
+
+        async function verifyFoodOrder(id) {
+            const code = document.getElementById(`food-code-${id}`)?.value || '';
+            await apiCall('verify_food_order_code', { id, code }, 'POST');
+            alert('Код подтвержден');
+        }
+
+        async function completeFoodOrder(id) {
+            await apiCall('complete_food_order', { id }, 'POST');
+            loadFoodOrders();
+        }
+
+        async function cancelFoodOrder(id) {
+            const note = prompt('Причина отмены') || '';
+            await apiCall('cancel_food_order', { id, note }, 'POST');
+            loadFoodOrders();
+        }
+
+        let currentFoodOrderGroup = 'active';
+
+        async function loadFoodOrders(group = currentFoodOrderGroup) {
+            currentFoodOrderGroup = group || 'active';
+            const box = document.getElementById('food-orders-list');
+            if (!box) return;
+            box.innerHTML = '<div class="loading">Загрузка заказов...</div>';
+            try {
+                const data = await apiCall('get_food_orders', { status_group: currentFoodOrderGroup });
+                const orders = data.data || [];
+                if (!orders.length) {
+                    box.innerHTML = `<div class="empty-state"><p>${currentFoodOrderGroup === 'active' ? 'Активных заказов пока нет' : 'Завершенных заказов пока нет'}</p></div>`;
+                    return;
+                }
+                box.innerHTML = orders.map(order => `
+                    <div class="card" style="margin-bottom:12px;">
+                        <div style="display:flex;justify-content:space-between;gap:16px;align-items:flex-start;">
+                            <div>
+                                <h3>#${order.id} ${order.table_name || 'Стол не указан'}</h3>
+                                <p>${order.user_login} • ${order.fulfillment_type === 'delivery' ? 'Доставка за ПК' : 'Самовывоз'} • ${order.payment_method}</p>
+                                <p>${order.items_summary || ''}</p>
+                                <p><b>${order.total}₽</b> • ${order.payment_status} • ${order.status}</p>
+                                <p>Код: <b>${order.confirmation_code}</b> ${order.verified_at ? '• подтвержден' : ''}</p>
+                            </div>
+                            <div style="display:grid;gap:8px;min-width:160px;">
+                                <input id="food-code-${order.id}" placeholder="Код или QR">
+                                <button class="btn btn-secondary" onclick="verifyFoodOrder(${order.id})">Проверить код</button>
+                                <button class="btn btn-primary" onclick="completeFoodOrder(${order.id})">Выдать / завершить</button>
+                                <button class="btn btn-danger" onclick="cancelFoodOrder(${order.id})">Отменить</button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                box.innerHTML = `<div class="error">${e.message}</div>`;
+            }
+        }
+
+        async function verifyFoodOrder(id) {
+            const code = document.getElementById(`food-code-${id}`)?.value || '';
+            await apiCall('verify_food_order_code', { id, code }, 'POST');
+            alert('Код подтвержден');
+            loadFoodOrders(currentFoodOrderGroup);
+        }
+
+        async function completeFoodOrder(id) {
+            await apiCall('complete_food_order', { id }, 'POST');
+            loadFoodOrders(currentFoodOrderGroup);
+        }
+
+        async function cancelFoodOrder(id) {
+            const note = prompt('Причина отмены') || '';
+            await apiCall('cancel_food_order', { id, note }, 'POST');
+            loadFoodOrders(currentFoodOrderGroup);
+        }
+
+        // ==================== API ====================
+        async function apiCall(action, params = {}, method = 'GET') {
+            try {
+                const url = new URL(API_URL, window.location.origin);
+                url.searchParams.set('action', action);
+
+                const options = { 
+                    method,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                };
+
+                if (method === 'GET') {
+                    Object.entries(params).forEach(([k, v]) => {
+                        if (v !== undefined && v !== null) {
+                            url.searchParams.set(k, v);
+                        }
+                    });
+                } else {
+                    options.headers['Content-Type'] = 'application/json';
+                    options.body = JSON.stringify({ ...params, action });
+                }
+
+                console.log(`API Call: ${method} ${url.toString()}`);
+                
+                const response = await fetch(url.toString(), options);
+                
+                if (!response.ok) {
+                    const text = await response.text();
+                    console.error(`HTTP Error ${response.status}:`, text);
+                    throw new Error(`HTTP ${response.status}: ${text.substring(0, 100)}`);
+                }
+
+                const text = await response.text();
+                console.log('Response:', text.substring(0, 200));
+                
+                let result;
+                try {
+                    result = JSON.parse(text);
+                } catch (e) {
+                    console.error('Invalid JSON:', text.substring(0, 200));
+                    throw new Error('Invalid JSON response');
+                }
+
+                if (result.code !== 0) {
+                    console.error('API Error:', result.message);
+                    throw new Error(result.message || 'API Error');
+                }
+
+                return result;
+            } catch (error) {
+                console.error('API Call failed:', error);
+                throw error;
+            }
+        }
+
+        // ==================== LOGGING ====================
+        function addLog(message, type = 'info') {
+            const logBox = document.getElementById('log-box');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            const timestamp = new Date().toLocaleTimeString('ru-RU');
+            entry.textContent = `[${timestamp}] ${message}`;
+            logBox.appendChild(entry);
+            logBox.scrollTop = logBox.scrollHeight;
+        }
+
+        // ==================== DASHBOARD ====================
+        async function loadDashboard() {
+            try {
+                const statsEl = document.getElementById('dashboard-stats');
+                const bookingsEl = document.getElementById('dashboard-bookings');
+                
+                if (!statsEl || !bookingsEl) return;
+
+                statsEl.innerHTML = '<div class="loading"><span class="spinner"></span> Загрузка статистики...</div>';
+                bookingsEl.innerHTML = '<div class="loading"><span class="spinner"></span> Загрузка бронирований...</div>';
+
+                const stats = await apiCall('get_cafe_stats', { cafe_id: currentClub });
+                const s = stats.data || {};
+
+                statsEl.innerHTML = `
+                    <div class="stat-card">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-value">${s.users?.total || 0}</div>
+                        <div class="stat-label">Пользователей</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-value">${(s.users?.total_balance || 0).toFixed(0)}₽</div>
+                        <div class="stat-label">Общий баланс</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">🎮</div>
+                        <div class="stat-value">${s.bookings?.active || 0}</div>
+                        <div class="stat-label">Активных броней</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">💻</div>
+                        <div class="stat-value">${s.pcs?.online || 0}/${s.pcs?.total || 0}</div>
+                        <div class="stat-label">ПК онлайн</div>
+                    </div>
+                `;
+
+                // Бронирования
+                try {
+                    const bookings = await apiCall('get_all_bookings', { cafe_id: currentClub });
+                    const bookingsData = bookings.data?.bookings || {};
+                    const clubBookings = bookingsData[currentClub] || [];
+
+                    const bookingsHtml = clubBookings.length > 0 ? `
+                        <table>
+                            <thead><tr><th>ПК</th><th>Пользователь</th><th>Начало</th><th>Окончание</th><th>Мин</th></tr></thead>
+                            <tbody>
+                                ${clubBookings.slice(0, 10).map(b => `
+                                    <tr>
+                                        <td>${b.product_pc_name || '-'}</td>
+                                        <td>${b.member_account || '-'}</td>
+                                        <td>${formatDate(b.product_available_date_local_from)}</td>
+                                        <td>${formatDate(b.product_available_date_local_to)}</td>
+                                        <td>${b.product_mins || '-'}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    ` : '<div class="empty-state"><div class="empty-state-icon">🎮</div><p>Нет активных бронирований</p></div>';
+
+                    bookingsEl.innerHTML = bookingsHtml;
+                } catch (error) {
+                    bookingsEl.innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚠️</div><p>Ошибка загрузки: ${error.message}</p></div>`;
+                }
+                
+                addLog('✅ Дашборд обновлён', 'success');
+            } catch (error) {
+                addLog(`❌ Ошибка дашборда: ${error.message}`, 'error');
+                document.getElementById('dashboard-stats').innerHTML = `<div class="empty-state"><div class="empty-state-icon">⚠️</div><p>Ошибка: ${error.message}</p></div>`;
+            }
+        }
+
+        // ==================== USERS ====================
+        async function loadUsers() {
+            try {
+                const search = document.getElementById('users-search')?.value || '';
+                const clubId = document.getElementById('users-club')?.value || currentClub;
+                currentClub = clubId;
+
+                const tbody = document.getElementById('users-tbody');
+                const countEl = document.getElementById('users-count');
+                
+                if (!tbody) return;
+
+                tbody.innerHTML = '<tr><td colspan="11" class="loading"><span class="spinner"></span> Загрузка...</td></tr>';
+
+                const result = await apiCall('get_users', { cafe_id: clubId, search });
+                allUsers = result.data?.users || [];
+
+                if (countEl) countEl.textContent = `Всего: ${allUsers.length}`;
+                
+                if (allUsers.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;color:var(--text-muted)">Пользователи не найдены</td></tr>';
+                } else {
+                    renderUsersTable(allUsers);
+                }
+                
+                addLog(`✅ Загружено ${allUsers.length} пользователей`, 'success');
+            } catch (error) {
+                addLog(`❌ Ошибка загрузки: ${error.message}`, 'error');
+                const tbody = document.getElementById('users-tbody');
+                if (tbody) {
+                    tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;color:var(--danger)">Ошибка загрузки</td></tr>';
+                }
+            }
+        }
+
+        function renderUsersTable(users) {
+            console.log('📋 Rendering users table:', users.length, 'users');
+            const tbody = document.getElementById('users-tbody');
+            if (!tbody) {
+                console.error('❌ Users tbody not found');
+                return;
+            }
+            
+            tbody.innerHTML = users.map((u, i) => {
+                const balance = parseFloat(u.member_balance || 0);
+                const bonus = parseFloat(u.member_balance_bonus || 0);
+                const points = parseInt(u.member_points || 0);
+                const discount = parseFloat(u.member_discount || 0);
+                const isVerified = u.is_verified || u.member_is_active;
+
+                return `
+                    <tr>
+                        <td>${i + 1}</td>
+                        <td><strong>${escapeHtml(u.member_account || '-')}</strong></td>
+                        <td>${escapeHtml(u.member_first_name || '-')}</td>
+                        <td>${escapeHtml(u.member_phone || '-')}</td>
+                        <td>${escapeHtml(u.member_email || '-')}</td>
+                        <td style="color: var(--success)">${balance.toFixed(2)}₽</td>
+                        <td style="color: var(--warning)">${bonus.toFixed(2)}</td>
+                        <td style="color: var(--purple)">${points.toLocaleString()}</td>
+                        <td>${(discount * 100).toFixed(0)}%</td>
+                        <td>${isVerified ? '<span class="badge badge-success">✓</span>' : '<span class="badge badge-danger">✗</span>'}</td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="btn btn-sm btn-primary" onclick="showUserDetail('${u.member_id}')">👁</button>
+                                <button class="btn btn-sm btn-success" onclick="showTopupModal('${u.member_id}', '${u.member_account}')">💰</button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteUser('${u.member_id}', '${u.member_account}')">🗑</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            
+            console.log('✅ Users table rendered');
+        }
+
+        // ==================== USER DETAIL ====================
+        async function showUserDetail(memberId) {
+            try {
+                const result = await apiCall('get_user', { member_id: memberId });
+                const u = result.data;
+
+                document.getElementById('user-modal-title').textContent = `👤 ${u.member_account}`;
+                document.getElementById('user-modal-body').innerHTML = `
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <div class="detail-label">Member ID</div>
+                            <div class="detail-value">${u.member_id}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Имя</div>
+                            <div class="detail-value">${u.member_first_name || '-'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Телефон</div>
+                            <div class="detail-value">${u.member_phone || '-'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Email</div>
+                            <div class="detail-value">${u.member_email || '-'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Баланс</div>
+                            <div class="detail-value" style="color: var(--success)">${(u.member_balance || 0).toFixed(2)}₽</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Бонусы</div>
+                            <div class="detail-value" style="color: var(--warning)">${(u.member_balance_bonus || 0).toFixed(2)}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Очки</div>
+                            <div class="detail-value" style="color: var(--purple)">${(u.member_points || 0).toLocaleString()}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Скидка</div>
+                            <div class="detail-value">${((u.member_discount || 0) * 100).toFixed(0)}%</div>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('user-modal-footer').innerHTML = `
+                    <button class="btn btn-secondary" onclick="closeModal('user-modal')">Закрыть</button>
+                    <button class="btn btn-success" onclick="showTopupModal('${u.member_id}', '${u.member_account}')">💰 Пополнить</button>
+                `;
+                openModal('user-modal');
+            } catch (error) {
+                addLog(`❌ Ошибка: ${error.message}`, 'error');
+            }
+        }
+
+        // ==================== CREATE USER ====================
+        function showCreateUserModal() {
+            openModal('create-user-modal');
+        }
+
+        async function createUser() {
+            try {
+                const login = document.getElementById('new-login').value;
+                const name = document.getElementById('new-name').value;
+                const phone = document.getElementById('new-phone').value;
+                const email = document.getElementById('new-email').value;
+                const password = document.getElementById('new-password').value;
+                const cafeId = document.getElementById('new-club').value;
+
+                if (!login || !name || !phone || !email || !password) {
+                    alert('Заполните все поля!');
+                    return;
+                }
+
+                const result = await apiCall('create_user', {
+                    login, name, phone, email, password, cafe_id: cafeId
+                }, 'POST');
+
+                addLog(`✅ Пользователь ${login} создан`, 'success');
+                closeModal('create-user-modal');
+                loadUsers();
+
+                // Очистить поля
+                ['new-login', 'new-name', 'new-phone', 'new-email', 'new-password'].forEach(id => {
+                    document.getElementById(id).value = '';
+                });
+            } catch (error) {
+                addLog(`❌ Ошибка создания: ${error.message}`, 'error');
+                alert(error.message);
+            }
+        }
+
+        // ==================== TOPUP ====================
+        function showTopupModal(memberId, login) {
+            document.getElementById('topup-member-id').value = memberId;
+            document.getElementById('topup-user').value = login;
+            openModal('topup-modal');
+        }
+
+        async function topupUser() {
+            try {
+                const memberId = document.getElementById('topup-member-id').value;
+                const amount = parseFloat(document.getElementById('topup-amount').value);
+
+                if (amount < 10) {
+                    alert('Минимальная сумма: 10₽');
+                    return;
+                }
+
+                const result = await apiCall('topup_user', { member_id: memberId, amount }, 'POST');
+                addLog(`✅ Баланс пополнен на ${result.data.added}₽ (бонус: ${result.data.bonus}₽)`, 'success');
+                closeModal('topup-modal');
+                loadUsers();
+            } catch (error) {
+                addLog(`❌ Ошибка пополнения: ${error.message}`, 'error');
+                alert(error.message);
+            }
+        }
+
+        // ==================== DELETE USER ====================
+        async function deleteUser(memberId, login) {
+            if (!confirm(`Удалить пользователя ${login} из локальной БД?`)) return;
+
+            try {
+                await apiCall('delete_user', { member_id: memberId }, 'POST');
+                addLog(`🗑 Пользователь ${login} удалён`, 'warn');
+                loadUsers();
+            } catch (error) {
+                addLog(`❌ Ошибка удаления: ${error.message}`, 'error');
+            }
+        }
+
+        // ==================== EXPORT ====================
+        function exportUsers() {
+            const cafeId = document.getElementById('users-club').value;
+            window.open(`${API_URL}?action=export_users&cafe_id=${cafeId}`, '_blank');
+            addLog('📥 Экспорт в CSV', 'success');
+        }
+
+        // ==================== BOOKINGS ====================
+        let allBookings = [];
+        let selectedBookings = new Set();
+
+        async function loadBookings() {
+            try {
+                const clubId = document.getElementById('bookings-club').value;
+                currentClub = clubId;
+                selectedBookings.clear();
+                updateBulkActions();
+
+                const result = await apiCall('get_all_bookings', { cafe_id: clubId });
+                allBookings = result.data.bookings[clubId] || [];
+
+                document.getElementById('bookings-count').textContent = `Всего: ${allBookings.length}`;
+
+                renderBookingsTable(allBookings);
+            } catch (error) {
+                addLog(`❌ Ошибка: ${error.message}`, 'error');
+                const tbody = document.getElementById('bookings-tbody');
+                if (tbody) tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:var(--danger)">Ошибка загрузки</td></tr>';
+            }
+        }
+
+        function renderBookingsTable(bookings) {
+            const tbody = document.getElementById('bookings-tbody');
+            if (!tbody) return;
+
+            // Фильтрация по поиску
+            const search = (document.getElementById('bookings-search')?.value || '').toLowerCase();
+            let filtered = bookings;
+            if (search) {
+                filtered = bookings.filter(b =>
+                    (b.product_pc_name || '').toLowerCase().includes(search) ||
+                    (b.member_account || '').toLowerCase().includes(search) ||
+                    (b.member_offer_id || '').toString().includes(search)
+                );
+            }
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;color:var(--text-muted)">Нет бронирований</td></tr>';
+                return;
+            }
+
+            const now = Date.now();
+            tbody.innerHTML = filtered.map((b, idx) => {
+                const endTime = new Date(b.product_available_date_local_to).getTime();
+                const isActive = (endTime + 1800000) > now;
+                const status = isActive ? '<span class="badge badge-success">Активна</span>' : '<span class="badge badge-warning">Завершена</span>';
+                const key = `${b.product_pc_name}-${b.member_offer_id}-${idx}`;
+                const isChecked = selectedBookings.has(key);
+
+                return `
+                    <tr class="${isChecked ? 'selected' : ''}" data-key="${key}">
+                        <td><input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleBooking('${key}', this.checked)"></td>
+                        <td><strong>${b.product_pc_name || '-'}</strong></td>
+                        <td>${b.member_account || '-'}</td>
+                        <td>${formatDate(b.product_available_date_local_from)}</td>
+                        <td>${formatDate(b.product_available_date_local_to)}</td>
+                        <td>${b.product_mins || '-'} мин</td>
+                        <td>${b.pc_area || '-'}</td>
+                        <td style="font-family:monospace;font-size:0.8em;">${b.member_offer_id || '-'}</td>
+                        <td>${status}</td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="btn btn-sm btn-danger" onclick="cancelBooking('${b.product_pc_name}', '${b.member_offer_id}')">❌</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            // Обновить чекбокс "выбрать все"
+            const selectAllCb = document.getElementById('bookings-select-all');
+            if (selectAllCb) selectAllCb.checked = filtered.length > 0 && filtered.every((b, idx) => selectedBookings.has(`${b.product_pc_name}-${b.member_offer_id}-${idx}`));
+        }
+
+        function toggleBooking(key, checked) {
+            if (checked) {
+                selectedBookings.add(key);
+            } else {
+                selectedBookings.delete(key);
+            }
+            updateBulkActions();
+            renderBookingsTable(allBookings);
+        }
+
+        function selectAllBookings(checked) {
+            const search = (document.getElementById('bookings-search')?.value || '').toLowerCase();
+            let filtered = allBookings;
+            if (search) {
+                filtered = allBookings.filter(b =>
+                    (b.product_pc_name || '').toLowerCase().includes(search) ||
+                    (b.member_account || '').toLowerCase().includes(search) ||
+                    (b.member_offer_id || '').toString().includes(search)
+                );
+            }
+
+            if (checked) {
+                filtered.forEach((b, idx) => selectedBookings.add(`${b.product_pc_name}-${b.member_offer_id}-${idx}`));
+            } else {
+                selectedBookings.clear();
+            }
+
+            updateBulkActions();
+            renderBookingsTable(allBookings);
+        }
+
+        function updateBulkActions() {
+            const bulkEl = document.getElementById('bookings-bulk-actions');
+            const countEl = document.getElementById('bookings-selected-count');
+            if (bulkEl) {
+                bulkEl.style.display = selectedBookings.size > 0 ? 'block' : 'none';
+            }
+            if (countEl) {
+                countEl.textContent = `Выбрано: ${selectedBookings.size}`;
+            }
+        }
+
+        // Поиск в реальном времени
+        document.addEventListener('DOMContentLoaded', () => {
+            const searchEl = document.getElementById('bookings-search');
+            if (searchEl) {
+                searchEl.addEventListener('input', () => renderBookingsTable(allBookings));
+            }
+        });
+
+        async function massCancelSelected() {
+            if (selectedBookings.size === 0) {
+                alert('Выберите бронирования для отмены');
+                return;
+            }
+
+            if (!confirm(`Отменить ${selectedBookings.size} бронирований?`)) return;
+
+            // Собираем данные выбранных броней
+            const search = (document.getElementById('bookings-search')?.value || '').toLowerCase();
+            let filtered = allBookings;
+            if (search) {
+                filtered = allBookings.filter(b =>
+                    (b.product_pc_name || '').toLowerCase().includes(search) ||
+                    (b.member_account || '').toLowerCase().includes(search) ||
+                    (b.member_offer_id || '').toString().includes(search)
+                );
+            }
+
+            const toCancel = [];
+            filtered.forEach((b, idx) => {
+                const key = `${b.product_pc_name}-${b.member_offer_id}-${idx}`;
+                if (selectedBookings.has(key) && b.member_offer_id) {
+                    toCancel.push({ pc_name: b.product_pc_name, member_offer_id: b.member_offer_id, member_account: b.member_account });
+                }
+            });
+
+            if (toCancel.length === 0) {
+                alert('Нет бронирований с member_offer_id для отмены');
+                return;
+            }
+
+            // Показываем лог
+            openMassLogModal();
+            const logContent = document.getElementById('mass-log-content');
+            logContent.innerHTML = '<div style="color:var(--info)">⏳ Отмена бронирований...</div>';
+
+            let success = 0;
+            let errors = 0;
+
+            for (const booking of toCancel) {
+                const logEntry = document.createElement('div');
+                logEntry.style.marginBottom = '5px';
+                logEntry.innerHTML = `⏳ Отмена: ${booking.pc_name} → ${booking.member_account} (${booking.member_offer_id})...`;
+                logContent.appendChild(logEntry);
+                logContent.scrollTop = logContent.scrollHeight;
+
+                try {
+                    await apiCall('cancel_booking', { pc_name: booking.pc_name, member_offer_id: booking.member_offer_id }, 'POST');
+                    logEntry.style.color = 'var(--success)';
+                    logEntry.innerHTML = `✓ Отмена: ${booking.pc_name} → ${booking.member_account} (${booking.member_offer_id})`;
+                    success++;
+                } catch (error) {
+                    logEntry.style.color = 'var(--danger)';
+                    logEntry.innerHTML = `✗ Ошибка: ${booking.pc_name} → ${booking.member_account} — ${error.message}`;
+                    errors++;
+                }
+
+                // Небольшая задержка чтобы не спамить API
+                await new Promise(r => setTimeout(r, 300));
+            }
+
+            const summary = document.createElement('div');
+            summary.style.cssText = 'margin-top:15px;padding-top:10px;border-top:1px solid #333;color:var(--gold);font-weight:bold;';
+            summary.textContent = `Итог: ✓ ${success} отменено, ✗ ${errors} ошибок`;
+            logContent.appendChild(summary);
+            logContent.scrollTop = logContent.scrollHeight;
+
+            addLog(`✅ Массовая отмена: ${success} успех, ${errors} ошибок`, 'success');
+            selectedBookings.clear();
+            updateBulkActions();
+            loadBookings();
+        }
+
+        // ==================== CANCEL BOOKING ====================
+        async function cancelBooking(pcName, memberOfferId) {
+            if (!confirm('Отменить бронирование?')) return;
+
+            try {
+                await apiCall('cancel_booking', { pc_name: pcName, member_offer_id: memberOfferId }, 'POST');
+                addLog('✅ Бронирование отменено', 'success');
+                loadBookings();
+            } catch (error) {
+                addLog(`❌ Ошибка: ${error.message}`, 'error');
+                alert(error.message);
+            }
+        }
+
+        // ==================== PCS ====================
+        async function loadPcs() {
+            try {
+                const clubId = document.getElementById('pcs-club').value;
+                currentClub = clubId;
+
+                const result = await apiCall('get_pc_status', { cafe_id: clubId });
+                const rooms = result.data.rooms || [];
+
+                document.getElementById('pcs-rooms').innerHTML = rooms.map(room => `
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>🖥 ${room.area_name} (${room.pcs_list?.length || 0} ПК)</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="pc-grid">
+                                ${(room.pcs_list || []).map(pc => {
+                                    const status = pc.pc_enabled ? 'available' : 'disabled';
+                                    const statusText = pc.pc_enabled ? '✓ Онлайн' : '✗ Оффлайн';
+                                    return `
+                                        <div class="pc-card ${status}">
+                                            <div class="pc-name">${pc.pc_name}</div>
+                                            <div class="pc-status">${statusText}</div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                addLog(`❌ Ошибка: ${error.message}`, 'error');
+            }
+        }
+
+        // ==================== PRICES ====================
+        async function loadPrices() {
+            try {
+                const clubId = document.getElementById('prices-club')?.value || currentClub;
+                const mins = parseInt(document.getElementById('prices-mins')?.value || 60);
+                currentClub = clubId;
+
+                console.log('💰 Loading prices for club:', clubId, 'mins:', mins);
+
+                const pricesTbody = document.getElementById('prices-prices-tbody');
+                const productsTbody = document.getElementById('prices-products-tbody');
+                const stepEl = document.getElementById('prices-step');
+                const breakEl = document.getElementById('prices-break');
+                const zonesEl = document.getElementById('prices-zones');
+                const pricesInfoEl = document.getElementById('prices-info');
+                const packagesInfoEl = document.getElementById('packages-info');
+                
+                if (pricesTbody) pricesTbody.innerHTML = '<tr><td colspan="7" class="loading"><span class="spinner"></span> Загрузка тарифов...</td></tr>';
+
+                const result = await apiCall('get_prices', { cafe_id: clubId, mins });
+                const data = result.data || {};
+
+                console.log('📊 Prices data:', data);
+                console.log('🏢 Zones:', data.zones_list);
+
+                // Информация о шаге и тех. перерыве
+                const stepBooking = data.step_start_booking || '-';
+                const techBreak = data.time_tech_break || {};
+                const techBreakStr = techBreak.time_start ? `${techBreak.time_start} (${techBreak.mins}мин)` : '-';
+                
+                if (stepEl) stepEl.textContent = typeof stepBooking === 'number' ? `${stepBooking} мин` : stepBooking;
+                if (breakEl) breakEl.textContent = techBreakStr;
+                
+                // Зоны
+                const zonesList = data.zones_list || [];
+                if (zonesEl) zonesEl.textContent = zonesList.length > 0 ? zonesList.join(', ') : 'Нет зон';
+
+                // Тарифы
+                const prices = data.prices || [];
+                
+                if (pricesTbody) {
+                    if (prices.length === 0) {
+                        pricesTbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:30px;">⚠️ Нет почасовых тарифов для этого клуба</td></tr>';
+                        if (pricesInfoEl) pricesInfoEl.textContent = '0 тарифов';
+                    } else {
+                        if (pricesInfoEl) pricesInfoEl.textContent = `${prices.length} тарифов`;
+                        
+                        pricesTbody.innerHTML = prices.map(p => {
+                            const pricePerHour = parseFloat(p.price_price1 || 0);
+                            const totalPrice = parseFloat(p.total_price || 0);
+                            const duration = parseInt(p.duration || 60);
+                            const calculatedPerHour = duration > 0 ? (totalPrice / duration * 60) : 0;
+                            const hours = Math.floor(duration / 60);
+                            const minsLeft = duration % 60;
+                            const durationStr = hours > 0 ? `${hours}ч ${minsLeft > 0 ? minsLeft + 'мин' : ''}` : `${duration}мин`;
+
+                            // Информация о зоне
+                            const zoneInfo = p.zone_info || null;
+                            const zoneName = p.group_name || 'Default';
+                            const isAllZones = zoneInfo?.is_all_zones || false;
+
+                            const zoneDisplay = isAllZones
+                                ? `<span class="group-tag" style="background: rgba(76, 175, 80, 0.15); color: var(--success);">✓ Общий тариф</span>`
+                                : `<span class="group-tag">${escapeHtml(zoneName)}</span>`;
+
+                            // Вычисляем скидку если есть
+                            const hasDiscount = pricePerHour > 0 && calculatedPerHour < pricePerHour;
+                            const discountPercent = hasDiscount ? Math.round((1 - calculatedPerHour / pricePerHour) * 100) : 0;
+
+                            return `
+                                <tr class="price-row-clickable" onclick='showPriceDetail(${JSON.stringify(p).replace(/'/g, "&#39;")})'>
+                                    <td><strong>${escapeHtml(p.price_name || '-')}</strong></td>
+                                    <td>${zoneDisplay}</td>
+                                    <td>${durationStr}</td>
+                                    <td>${pricePerHour.toFixed(2)}₽</td>
+                                    <td style="color: var(--success); font-weight: bold;">
+                                        ${totalPrice.toFixed(2)}₽
+                                        ${hasDiscount ? `<br><span class="badge badge-success" style="font-size:0.7em;">-${discountPercent}%</span>` : ''}
+                                    </td>
+                                    <td style="color: ${calculatedPerHour < pricePerHour ? 'var(--success)' : 'var(--text-secondary)'}">
+                                        ${calculatedPerHour.toFixed(2)}₽
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('');
+                    }
+                }
+
+                // Пакеты
+                const products = data.products || [];
+                
+                if (productsTbody) {
+                    if (products.length === 0) {
+                        productsTbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:30px;">⚠️ Нет пакетов для этого клуба</td></tr>';
+                        if (packagesInfoEl) packagesInfoEl.textContent = '0 пакетов';
+                    } else {
+                        // Удаляем дубликаты пакетов
+                        const uniqueProducts = [];
+                        const seen = new Set();
+                        products.forEach(p => {
+                            const key = `${p.product_id}-${p.product_name}-${p.group_name}-${p.total_price}`;
+                            if (!seen.has(key)) {
+                                seen.add(key);
+                                uniqueProducts.push(p);
+                            }
+                        });
+
+                        if (packagesInfoEl) packagesInfoEl.textContent = `${uniqueProducts.length} уникальных из ${products.length}`;
+
+                        productsTbody.innerHTML = uniqueProducts.map(p => {
+                            const durationMin = parseInt(p.duration_min || p.duration || 0);
+                            const hours = Math.floor(durationMin / 60);
+                            const minsLeft = durationMin % 60;
+                            const durationStr = hours > 0 ? `${hours}ч ${minsLeft > 0 ? minsLeft + 'мин' : ''}` : `${durationMin}мин`;
+                            
+                            const totalPrice = parseFloat(p.total_price || 0);
+                            const pricePerHourCalc = durationMin > 0 ? (totalPrice / durationMin * 60) : 0;
+
+                            // Информация о зоне
+                            const zoneInfo = p.zone_info || null;
+                            const zoneName = p.group_name || 'Default';
+                            const isAllZones = zoneInfo?.is_all_zones || false;
+                            
+                            const zoneDisplay = isAllZones 
+                                ? `<span class="group-tag" style="background: rgba(76, 175, 80, 0.15); color: var(--success);">✓ Общий тариф</span>`
+                                : `<span class="group-tag">${escapeHtml(zoneName)}</span>`;
+
+                            // Показ дней недели
+                            let weekdaysStr = '-';
+                            if (p.product_show_weekday) {
+                                const dayNames = {1: 'Пн', 2: 'Вт', 3: 'Ср', 4: 'Чт', 5: 'Пт', 6: 'Сб', 7: 'Вс'};
+                                const days = p.product_show_weekday.split(/[|,]/).map(d => dayNames[d.trim()] || d.trim());
+                                weekdaysStr = days.join(', ');
+                            }
+
+                            return `
+                                <tr class="price-row-clickable" onclick='showPriceDetail(${JSON.stringify(p).replace(/'/g, "&#39;")})'>
+                                    <td>
+                                        <strong>${escapeHtml(p.product_name || p.show_product_name || '-')}</strong>
+                                        ${p.is_calc_duration ? '<br><span class="badge badge-info" style="font-size:0.7em;">Динамич.</span>' : ''}
+                                    </td>
+                                    <td>${zoneDisplay}</td>
+                                    <td>${durationStr}</td>
+                                    <td>
+                                        ${p.product_show_time || '-'}
+                                        <br><span style="font-size:0.8em; color:var(--text-secondary);">${weekdaysStr}</span>
+                                    </td>
+                                    <td style="color: var(--success); font-weight: bold;">
+                                        ${totalPrice.toFixed(2)}₽
+                                    </td>
+                                    <td>${pricePerHourCalc.toFixed(2)}₽</td>
+                                </tr>
+                            `;
+                        }).join('');
+                    }
+                }
+
+                addLog(`✅ Загружено ${prices.length} тарифов и ${products.length} пакетов`, 'success');
+            } catch (error) {
+                addLog(`❌ Ошибка загрузки тарифов: ${error.message}`, 'error');
+                console.error('Prices error:', error);
+            }
+        }
+
+        // ==================== CAFES ====================
+        async function loadCafes() {
+            try {
+                const result = await apiCall('get_cafes');
+                const cafes = result.data;
+
+                document.getElementById('cafes-stats').innerHTML = cafes.map(c => `
+                    <div class="stat-card">
+                        <div class="stat-icon">🏢</div>
+                        <div class="stat-value" style="font-size:1.2em">${c.address}</div>
+                        <div class="stat-label">ID: ${c.icafe_id}</div>
+                        <div class="stat-label">Пользователей: ${c.users_count || 0}</div>
+                        <div class="stat-label">Активных броней: ${c.active_bookings || 0}</div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                addLog(`❌ Ошибка: ${error.message}`, 'error');
+            }
+        }
+
+        // ==================== RANKING ====================
+        async function loadRanking() {
+            try {
+                const clubId = document.getElementById('ranking-club').value;
+                const page = document.getElementById('ranking-page').value;
+                currentClub = clubId;
+
+                const result = await apiCall('get_ranking', { cafe_id: clubId, page, pageSize: 20 });
+                const ranking = result.data.rankings || [];
+
+                document.getElementById('ranking-list').innerHTML = ranking.map(r => `
+                    <div class="ranking-item">
+                        <div class="ranking-number">${r.rank}</div>
+                        <div class="ranking-info">
+                            <div class="ranking-name">${r.member_first_name || r.member_account}</div>
+                            <div class="ranking-stats">Часов: ${r.total_hours || 0} | Потрачено: ${(r.total_spent || 0).toFixed(0)}₽</div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                addLog(`❌ Ошибка: ${error.message}`, 'error');
+            }
+        }
+
+        // ==================== ANALYTICS ====================
+        async function loadAnalytics() {
+            try {
+                const clubId = document.getElementById('analytics-club').value;
+                const memberId = document.getElementById('analytics-member-id').value;
+                currentClub = clubId;
+
+                if (!memberId) {
+                    alert('Введите Member ID');
+                    return;
+                }
+
+                const result = await apiCall('get_analytics', { cafe_id: clubId, member_id: memberId });
+                const a = result.data;
+
+                document.getElementById('analytics-content').innerHTML = `
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">🎮</div>
+                            <div class="stat-value">${a.total_visits || 0}</div>
+                            <div class="stat-label">Визитов</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">⏱</div>
+                            <div class="stat-value">${a.total_hours || 0}</div>
+                            <div class="stat-label">Часов</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">💰</div>
+                            <div class="stat-value">${(a.total_spent || 0).toFixed(0)}₽</div>
+                            <div class="stat-label">Потрачено</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">⏰</div>
+                            <div class="stat-value">${a.avg_session_duration || 0}</div>
+                            <div class="stat-label">Сред. длительность (мин)</div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="detail-grid">
+                                <div class="detail-item">
+                                    <div class="detail-label">Любимая зона</div>
+                                    <div class="detail-value">${a.favorite_zone || '-'}</div>
+                                </div>
+                                <div class="detail-item">
+                                    <div class="detail-label">Любимое время</div>
+                                    <div class="detail-value">${a.favorite_time || '-'}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } catch (error) {
+                addLog(`❌ Ошибка: ${error.message}`, 'error');
+            }
+        }
+
+        // ==================== MODALS ====================
+        function openModal(id) {
+            document.getElementById(id).classList.add('active');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+        }
+
+        // ==================== PRICE DETAIL MODAL ====================
+        function showPriceDetail(priceData) {
+            console.log('💰 Showing price detail:', priceData);
+            
+            const titleEl = document.getElementById('price-detail-title');
+            const contentEl = document.getElementById('price-detail-content');
+            
+            if (titleEl) {
+                titleEl.textContent = `💰 ${priceData.price_name || 'Детали тарифа'}`;
+            }
+            
+            if (contentEl) {
+                contentEl.innerHTML = syntaxHighlightJSON(priceData);
+            }
+            
+            openModal('price-detail-modal');
+        }
+
+        function syntaxHighlightJSON(json) {
+            let jsonStr = JSON.stringify(json, null, 2);
+            
+            // Экранируем HTML
+            jsonStr = jsonStr.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            
+            // Подсветка синтаксиса
+            jsonStr = jsonStr.replace(
+                /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
+                function (match) {
+                    let cls = 'json-number';
+                    if (/^"/.test(match)) {
+                        if (/:$/.test(match)) {
+                            cls = 'json-key';
+                            // Убираем двоеточие из ключа для стилизации
+                            match = match.replace(/:$/, '') + '</span>:';
+                            return '<span class="' + cls + '">' + match;
+                        } else {
+                            cls = 'json-string';
+                        }
+                    } else if (/true|false/.test(match)) {
+                        cls = 'json-boolean';
+                    } else if (/null/.test(match)) {
+                        cls = 'json-null';
+                    }
+                    return '<span class="' + cls + '">' + match + '</span>';
+                }
+            );
+            
+            return jsonStr;
+        }
+
+        // ==================== UTILS ====================
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            try {
+                const d = new Date(dateStr);
+                if (isNaN(d.getTime())) return '-';
+                return d.toLocaleString('ru-RU', { 
+                    day: '2-digit', 
+                    month: '2-digit',
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+            } catch (e) {
+                return '-';
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Search debounce
+        let searchTimeout;
+        document.getElementById('users-search')?.addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => loadUsers(), 500);
+        });
+
+        // ==================== MASS BOOKING ====================
+        let massSelectedUsers = [];
+
+        function showMassBookingModal() {
+            massSelectedUsers = [];
+            document.getElementById('mass-pcs').value = '';
+            document.getElementById('mass-login').value = '';
+            document.getElementById('mass-member-ids').value = '';
+            document.getElementById('mass-user-search').value = '';
+            document.getElementById('mass-user-results').innerHTML = '';
+            document.getElementById('mass-selected-users').innerHTML = '';
+
+            // Установить сегодняшнюю дату
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('mass-date').value = today;
+
+            // Установить клуб
+            document.getElementById('mass-club').value = currentClub;
+
+            openModal('mass-booking-modal');
+        }
+
+        async function searchMassBookingUsers() {
+            const query = document.getElementById('mass-user-search').value.trim();
+            if (!query) {
+                alert('Введите ник для поиска');
+                return;
+            }
+
+            const clubId = document.getElementById('mass-club').value;
+            const resultsEl = document.getElementById('mass-user-results');
+            resultsEl.innerHTML = '<div style="color:var(--info);padding:10px;">🔍 Поиск...</div>';
+
+            try {
+                const result = await apiCall('get_users', { cafe_id: clubId, search: query });
+                const users = result.data?.users || [];
+
+                if (users.length === 0) {
+                    resultsEl.innerHTML = '<div style="color:var(--text-muted);padding:10px;">Пользователи не найдены</div>';
+                    return;
+                }
+
+                resultsEl.innerHTML = users.slice(0, 20).map(u => {
+                    const isSelected = massSelectedUsers.some(su => su.member_id === u.member_id);
+                    return `
+                        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px;margin-bottom:5px;background:var(--bg-primary);border-radius:6px;cursor:pointer;${isSelected ? 'opacity:0.4;pointer-events:none;' : ''}" 
+                             onclick="${isSelected ? '' : `addMassUser('${u.member_id}', '${u.member_account.replace(/'/g, "\\'")}')`}">
+                            <div>
+                                <strong>${escapeHtml(u.member_account)}</strong> 
+                                <span style="color:var(--text-secondary);font-size:0.85em;">(${escapeHtml(u.member_first_name || '-')})</span>
+                                <br><span style="font-size:0.75em;color:var(--text-muted);">ID: ${u.member_id} | Баланс: ${(u.member_balance || 0).toFixed(2)}₽</span>
+                            </div>
+                            <div>${isSelected ? '<span class="badge badge-success">✓</span>' : '<button class="btn btn-sm btn-secondary">+</button>'}</div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                resultsEl.innerHTML = `<div style="color:var(--danger);padding:10px;">Ошибка: ${error.message}</div>`;
+            }
+        }
+
+        function addMassUser(memberId, login) {
+            if (massSelectedUsers.some(u => u.member_id === memberId)) return;
+            massSelectedUsers.push({ member_id: memberId, login });
+            renderMassSelectedUsers();
+            searchMassBookingUsers(); // Обновить результаты поиска
+        }
+
+        function removeMassUser(memberId) {
+            massSelectedUsers = massSelectedUsers.filter(u => u.member_id !== memberId);
+            renderMassSelectedUsers();
+        }
+
+        function renderMassSelectedUsers() {
+            const el = document.getElementById('mass-selected-users');
+            if (!el) return;
+
+            if (massSelectedUsers.length === 0) {
+                el.innerHTML = '';
+                return;
+            }
+
+            el.innerHTML = `
+                <div style="padding:10px;background:var(--bg-primary);border-radius:6px;">
+                    <strong style="color:var(--gold);">Выбранные пользователи (${massSelectedUsers.length}):</strong>
+                    <div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:5px;">
+                        ${massSelectedUsers.map(u => `
+                            <span style="display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:var(--bg-card);border-radius:12px;font-size:0.85em;">
+                                ${escapeHtml(u.login)}
+                                <span style="cursor:pointer;color:var(--danger);" onclick="removeMassUser('${u.member_id}')">✕</span>
+                            </span>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        async function executeMassBooking() {
+            const clubId = document.getElementById('mass-club').value;
+            const pcsStr = document.getElementById('mass-pcs').value.trim();
+            const date = document.getElementById('mass-date').value;
+            const time = document.getElementById('mass-time').value;
+            const duration = parseInt(document.getElementById('mass-duration').value);
+            const login = document.getElementById('mass-login').value.trim();
+            const memberIdsStr = document.getElementById('mass-member-ids').value.trim();
+
+            // Валидация
+            if (!pcsStr) { alert('Введите хотя бы один ПК'); return; }
+            if (!date) { alert('Выберите дату'); return; }
+            if (!time) { alert('Выберите время'); return; }
+            if (duration < 30) { alert('Минимальная длительность: 30 мин'); return; }
+
+            const pcs = pcsStr.split(',').map(p => p.trim()).filter(p => p);
+
+            // Определяем пользователей
+            let users = [...massSelectedUsers];
+
+            // Если указан логин — добавляем
+            if (login && !users.some(u => u.login === login)) {
+                users.push({ member_id: '', login, account: login });
+            }
+
+            // Если указаны member_id через запятую
+            if (memberIdsStr) {
+                const ids = memberIdsStr.split(',').map(id => id.trim()).filter(id => id);
+                for (const id of ids) {
+                    if (!users.some(u => u.member_id === id)) {
+                        users.push({ member_id: id, login: id });
+                    }
+                }
+            }
+
+            if (users.length === 0) {
+                alert('Выберите хотя бы одного пользователя (через поиск, логин или Member ID)');
+                return;
+            }
+
+            if (!confirm(`Создать ${pcs.length * users.length} бронирований?\nПК: ${pcs.join(', ')}\nПользователи: ${users.map(u => u.login).join(', ')}`)) return;
+
+            closeModal('mass-booking-modal');
+            openMassLogModal();
+            const logContent = document.getElementById('mass-log-content');
+            logContent.innerHTML = '<div style="color:var(--info)">⏳ Создание бронирований...</div>';
+
+            let success = 0;
+            let errors = 0;
+            const total = pcs.length * users.length;
+
+            for (const user of users) {
+                for (const pc of pcs) {
+                    const logEntry = document.createElement('div');
+                    logEntry.style.marginBottom = '5px';
+                    logEntry.innerHTML = `⏳ Бронь: ${pc} → ${user.login} (${date} ${time}, ${duration}мин)...`;
+                    logContent.appendChild(logEntry);
+                    logContent.scrollTop = logContent.scrollHeight;
+
+                    try {
+                        const result = await apiCall('create_booking', {
+                            cafe_id: clubId,
+                            pc_name: pc,
+                            login: user.login,
+                            member_id: user.member_id || '',
+                            start_date: date,
+                            start_time: time,
+                            duration_min: duration
+                        }, 'POST');
+
+                        const password = result.data?.booking_password || '-';
+                        const cost = result.data?.cost || '-';
+                        logEntry.style.color = 'var(--success)';
+                        logEntry.innerHTML = `✓ Бронь: ${pc} → ${user.login} | Пароль: ${password} | Стоимость: ${cost}₽`;
+                        success++;
+                    } catch (error) {
+                        logEntry.style.color = 'var(--danger)';
+                        logEntry.innerHTML = `✗ Бронь: ${pc} → ${user.login} — ${error.message}`;
+                        errors++;
+                    }
+
+                    await new Promise(r => setTimeout(r, 500));
+                }
+            }
+
+            const summary = document.createElement('div');
+            summary.style.cssText = 'margin-top:15px;padding-top:10px;border-top:1px solid #333;color:var(--gold);font-weight:bold;';
+            summary.textContent = `Итог: всего ${total}, ✓ ${success} создано, ✗ ${errors} ошибок`;
+            logContent.appendChild(summary);
+            logContent.scrollTop = logContent.scrollHeight;
+
+            addLog(`✅ Массовое бронирование: ${success} создано, ${errors} ошибок`, 'success');
+            loadBookings();
+        }
+
+        function openMassLogModal() {
+            document.getElementById('mass-log-content').innerHTML = '';
+            openModal('mass-log-modal');
+        }
+    </script>
+</body>
+</html>

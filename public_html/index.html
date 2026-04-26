@@ -1,0 +1,390 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0a0e1a">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="BlackBears Play">
+    <title>BlackBears Play — Бронирование</title>
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/pwa/icon-192.png">
+    <link rel="apple-touch-icon" href="assets/pwa/apple-touch-icon.png">
+    <link rel="stylesheet" href="css/style.css?v=20260425103000">
+</head>
+<body class="design-test-modern">
+
+<!-- ========== ЭКРАН АВТОРИЗАЦИИ ========== -->
+<div id="auth-screen" class="screen active">
+    <div class="auth-container">
+        <!-- Баннер приглашения -->
+        <div id="invite-banner" class="invite-banner hidden">
+            <div class="invite-banner-icon">BB</div>
+            <div class="invite-banner-text">
+                <strong id="invite-banner-sender">—</strong> приглашает тебя в BlackBears!
+                <div class="invite-banner-bonus">+50₽ бонус за регистрацию</div>
+                <div class="invite-banner-expires" id="invite-banner-expires"></div>
+            </div>
+            <button id="btn-close-invite" class="invite-banner-close" title="Закрыть">✕</button>
+        </div>
+
+        <div class="auth-shell">
+            <div class="logo-area auth-hero">
+                <h1 class="game-title">BlackBears Play</h1>
+                <p class="game-subtitle"></p>
+            </div>
+            <div class="auth-barney">
+                <div class="auth-barney__avatar dialog-avatar">
+                    <img src="assets/bear.svg" alt="Барни">
+                </div>
+                <div class="auth-barney__bubble dialog-bubble">
+                    <div class="auth-barney__name"></div>
+                    <div class="dialog-text auth-barney__text" id="auth-dialog-text"></div>
+                </div>
+            </div>
+            <div class="auth-form auth-card" id="auth-form">
+                <div class="auth-card__glow"></div>
+                <div class="auth-card__inner">
+                    <div class="auth-card__header">
+                        <div class="auth-card__title-wrap">
+                            <div class="auth-card__title"></div>
+                        </div>
+                    </div>
+
+                    <div class="input-group auth-inputs" id="auth-input-group">
+                        <input type="text" id="auth-login" class="game-input" placeholder="" autocomplete="username">
+                        <input type="password" id="auth-password" class="game-input" placeholder="" autocomplete="current-password">
+                    </div>
+                    <div class="input-group auth-inputs hidden" id="auth-extra-group">
+                        <input type="tel" id="auth-phone" class="game-input" placeholder="">
+                        <input type="email" id="auth-email" class="game-input" placeholder="">
+                        <input type="text" id="auth-name" class="game-input" placeholder="">
+                    </div>
+
+                    <div class="auth-actions">
+                        <button id="btn-auth-login" class="btn btn-primary"></button>
+                        <button id="btn-auth-register" class="btn btn-secondary"></button>
+                        <button id="btn-auth-back" class="btn btn-secondary hidden"></button>
+                        <button id="btn-auth-confirm" class="btn btn-primary hidden"></button>
+                    </div>
+
+                    <div class="auth-error" id="auth-error"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ========== ГЛАВНЫЙ ЭКРАН ========== -->
+<div id="main-screen" class="screen">
+    <!-- Статус-бар -->
+    <div class="status-bar">
+        <div class="status-left">
+            <span class="status-user" id="status-user">Гость</span>
+            <span class="status-coins"><img src="./ui%20kit/icon/bulk/wallet-money.svg" alt="" class="status-inline-icon"><span class="status-balance" id="status-balance">0</span></span>
+            <span class="status-bonus"><img src="./ui%20kit/icon/bulk/ticket-star.svg" alt="" class="status-inline-icon"><span class="status-bonus-balance" id="status-bonus-balance">0</span></span>
+            <span class="status-points"><img src="./ui%20kit/icon/bulk/cup.svg" alt="" class="status-inline-icon"><span class="status-points-balance" id="status-points-balance">0</span></span>
+            <span class="status-icon">BB</span>
+        </div>
+        <div class="status-right"></div>
+    </div>
+
+    <!-- Диалоговое окно -->
+    <div class="dialog-area">
+        <div class="dialog-box" id="dialog-box">
+            <div class="dialog-content" id="dialog-content">
+                <div class="typing-indicator" id="typing-indicator">
+                    <span></span><span></span><span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Панель действий -->
+    <div class="action-panel" id="action-panel">
+        <!-- Кнопки генерируются динамически -->
+    </div>
+</div>
+
+<!-- ========== МОДАЛЬНОЕ ОКНО — ПОПОЛНЕНИЕ БАЛАНСА ========== -->
+<div id="modal-topup" class="modal-overlay hidden">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3></h3>
+            <button class="btn-close" id="btn-close-topup">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p class="modal-description"></p>
+            <input type="number" id="topup-amount" class="game-input" placeholder="" min="10">
+            <div class="topup-presets">
+                <button class="btn-preset" data-amount="100">100₽</button>
+                <button class="btn-preset" data-amount="300">300₽</button>
+                <button class="btn-preset" data-amount="500">500₽</button>
+                <button class="btn-preset" data-amount="1000">1000₽</button>
+            </div>
+            <div class="topup-methods" id="topup-methods" role="group" aria-label="Способ оплаты">
+                <button class="topup-method active" type="button" data-method="card">
+                    <img src="./ui%20kit/icon/bulk/card-send.svg" alt="" aria-hidden="true">
+                    <span>Карта</span>
+                </button>
+                <button class="topup-method" type="button" data-method="sbp">
+                    <img src="./ui%20kit/icon/bulk/scan.svg" alt="" aria-hidden="true">
+                    <span>СБП</span>
+                </button>
+            </div>
+            <div class="modal-error" id="topup-error"></div>
+        </div>
+        <div class="modal-footer">
+            <button id="btn-topup-confirm" class="btn btn-primary"></button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== МОДАЛЬНОЕ ОКНО — ПОДТВЕРЖДЕНИЕ БРОНИ ========== -->
+<div id="modal-confirm-booking" class="modal-overlay hidden">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Подтверждение брони</h3>
+            <button class="btn-close" id="btn-close-booking-confirm">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="booking-details" id="booking-details">
+                <!-- Заполняется динамически -->
+            </div>
+            <div class="modal-error" id="booking-confirm-error"></div>
+        </div>
+        <div class="modal-footer">
+            <button id="btn-booking-cancel" class="btn btn-secondary">Отмена</button>
+            <button id="btn-booking-confirm" class="btn btn-primary">Оплатить и забронировать</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== МОДАЛЬНОЕ ОКНО — ДРУЗЬЯ ========== -->
+<div id="modal-friends" class="modal-overlay hidden">
+    <div class="modal-content modal-lg">
+        <div class="modal-header">
+            <h3>Отряд</h3>
+            <button class="btn-close" id="btn-close-friends">&times;</button>
+        </div>
+        <div class="modal-body">
+            <!-- Таббар -->
+            <div class="friends-tabs">
+                <button class="friends-tab active" data-tab="friends">Друзья</button>
+                <button class="friends-tab" data-tab="outgoing">Заявки</button>
+                <button class="friends-tab" data-tab="invitations">Приглашения</button>
+            </div>
+
+            <!-- Контент табов -->
+            <div id="tab-friends" class="friends-tab-content active">
+                <div id="friends-pending-section" class="hidden">
+                    <h4 style="color:var(--gold);margin-bottom:8px;">Входящие запросы</h4>
+                    <div id="friends-pending-list"></div>
+                    <hr style="border-color:var(--gold-dim);margin:12px 0;">
+                </div>
+                <div id="friends-list"></div>
+                <div class="modal-error" id="friends-error"></div>
+            </div>
+
+            <div id="tab-outgoing" class="friends-tab-content">
+                <div id="outgoing-list"></div>
+                <div class="modal-error" id="outgoing-error"></div>
+            </div>
+
+            <div id="tab-invitations" class="friends-tab-content">
+                <div id="invitations-list"></div>
+                <div class="modal-error" id="invitations-error"></div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button id="btn-add-friend" class="btn btn-secondary"><img src="./ui%20kit/icon/bulk/user-add.svg" alt="" class="inline-action-icon">Добавить</button>
+            <button id="btn-invite-friend" class="btn btn-secondary"><img src="./ui%20kit/icon/bulk/send.svg" alt="" class="inline-action-icon">Пригласить</button>
+            <button id="btn-close-friends-ok" class="btn btn-primary">Закрыть</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== МОДАЛЬНОЕ ОКНО — ДОБАВИТЬ ДРУГА ========== -->
+<div id="modal-add-friend" class="modal-overlay hidden">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3><img src="./ui%20kit/icon/bulk/user-add.svg" alt="" class="inline-action-icon">Добавить друга</h3>
+            <button class="btn-close" id="btn-close-add-friend">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="add-friend-step1">
+                <p class="modal-description">Как хочешь добавить товарища?</p>
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                    <button id="btn-search-by-login" class="btn btn-secondary" style="width:100%;">Найти по логину</button>
+                    <button id="btn-create-guest" class="btn btn-secondary" style="width:100%;">Создать гостевой аккаунт</button>
+                    <button id="btn-send-invite" class="btn btn-secondary" style="width:100%;">Отправить приглашение</button>
+                </div>
+            </div>
+            <div id="add-friend-search" class="hidden">
+                <p class="modal-description">Введи позывной друга:</p>
+                <input type="text" id="friend-search-input" class="game-input" placeholder="Логин друга...">
+                <button id="btn-do-search" class="btn btn-primary" style="width:100%;">Найти</button>
+                <div id="friend-search-results" style="margin-top:10px;"></div>
+            </div>
+            <div id="add-friend-guest" class="hidden">
+                <p class="modal-description">Создам гостевой аккаунт для друга:</p>
+                <input type="text" id="guest-login" class="game-input" placeholder="Позывной (логин)">
+                <input type="text" id="guest-name" class="game-input" placeholder="Имя друга">
+                <input type="tel" id="guest-phone" class="game-input" placeholder="Телефон друга">
+                <input type="email" id="guest-email" class="game-input" placeholder="Почта друга">
+                <input type="password" id="guest-password" class="game-input" placeholder="Пароль друга">
+                <button id="btn-do-create-guest" class="btn btn-primary" style="width:100%;">Создать и добавить</button>
+            </div>
+            <div class="modal-error" id="add-friend-error"></div>
+        </div>
+        <div class="modal-footer">
+            <button id="btn-back-to-add-friend" class="btn btn-secondary hidden">Назад</button>
+            <button id="btn-close-add-friend-ok" class="btn btn-primary">Закрыть</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== МОДАЛЬНОЕ ОКНО — ПРИГЛАШЕНИЕ (ссылка + QR) ========== -->
+<div id="modal-invite" class="modal-overlay hidden">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Пригласить друга</h3>
+            <button class="btn-close" id="btn-close-invite">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p class="modal-description">Друг перейдёт по ссылке или отсканирует QR — и сразу попадёт в твой отряд!</p>
+            <div id="invite-link-section" style="text-align:center;margin:16px 0;">
+                <div id="invite-qr" style="display:inline-block;margin:10px auto;"></div>
+                <div style="background:var(--bg-tertiary);border:1px solid var(--gold-dim);border-radius:8px;padding:12px;margin-top:10px;">
+                    <div id="invite-url-text" style="font-family:var(--font-mono);font-size:0.75rem;word-break:break-all;color:var(--neon-blue);margin-bottom:8px;"></div>
+                    <button id="btn-copy-invite-url" class="btn btn-secondary" style="padding:8px 16px;font-size:0.85rem;">Копировать ссылку</button>
+                </div>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:10px;">
+                <button id="btn-share-vk" class="btn btn-secondary" style="flex:1;">VK</button>
+                <button id="btn-share-tg" class="btn btn-secondary" style="flex:1;">Telegram</button>
+            </div>
+            <div class="modal-error" id="invite-error"></div>
+        </div>
+        <div class="modal-footer">
+            <button id="btn-close-invite-ok" class="btn btn-primary">Закрыть</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== МОДАЛЬНОЕ ОКНО — АВATAR ========== -->
+<div id="modal-avatar" class="modal-overlay hidden">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>🖼 Выбрать аватарку</h3>
+            <button class="btn-close" id="btn-close-avatar">&times;</button>
+        </div>
+        <div class="modal-body">
+            <!-- Превью текущей -->
+            <div id="avatar-preview" style="text-align:center;margin-bottom:16px;">
+                <div id="avatar-preview-icon" style="font-size:64px;display:inline-block;">🐻</div>
+                <img id="avatar-preview-img" class="hidden" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid var(--gold-dim);">
+            </div>
+
+            <!-- Пресеты -->
+            <p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:8px;">Выбери из готовых:</p>
+            <div id="avatar-presets" class="avatar-presets">
+                <button class="avatar-preset" data-emoji="🐻">🐻</button>
+                <button class="avatar-preset" data-emoji="🦊">🦊</button>
+                <button class="avatar-preset" data-emoji="🐺">🐺</button>
+                <button class="avatar-preset" data-emoji="🐯">🐯</button>
+                <button class="avatar-preset" data-emoji="🦁">🦁</button>
+                <button class="avatar-preset" data-emoji="🐸">🐸</button>
+                <button class="avatar-preset" data-emoji="🐵">🐵</button>
+                <button class="avatar-preset" data-emoji="🦅">🦅</button>
+                <button class="avatar-preset" data-emoji="🐉">🐉</button>
+                <button class="avatar-preset" data-emoji="🦈">🦈</button>
+                <button class="avatar-preset" data-emoji="🎮">🎮</button>
+                <button class="avatar-preset" data-emoji="👾">👾</button>
+                <button class="avatar-preset" data-emoji="🤖">🤖</button>
+                <button class="avatar-preset" data-emoji="👻">👻</button>
+                <button class="avatar-preset" data-emoji="💀">💀</button>
+                <button class="avatar-preset" data-emoji="🔥">🔥</button>
+            </div>
+
+            <hr style="border-color:var(--gold-dim);margin:16px 0;">
+
+            <!-- Загрузка своего фото -->
+            <p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:8px;">Или загрузи своё фото:</p>
+            <input type="file" id="avatar-file-input" accept="image/jpeg,image/png,image/gif,image/webp" style="display:none;">
+            <button id="btn-avatar-upload" class="btn btn-secondary" style="width:100%;"><img src="./ui%20kit/icon/bulk/gallery-add.svg" alt="" class="inline-action-icon">Загрузить фото</button>
+            <p style="color:var(--text-muted);font-size:0.75rem;margin-top:6px;text-align:center;">JPG, PNG, GIF, WebP • Авто-сжатие до 200×200</p>
+
+            <div class="modal-error" id="avatar-error"></div>
+        </div>
+        <div class="modal-footer">
+            <button id="btn-avatar-delete" class="btn btn-danger" style="margin-right:auto;"><img src="./ui%20kit/icon/bulk/trash.svg" alt="" class="inline-action-icon">Удалить</button>
+            <button id="btn-avatar-close" class="btn btn-primary">Готово</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== МОДАЛЬНОЕ ОКНО — SMS-ВЕРИФИКАЦИЯ ========== -->
+<div id="modal-sms-verify" class="modal-overlay hidden">
+    <div class="modal-content modal-sm">
+        <div class="modal-header">
+            <h3>Подтверждение SMS</h3>
+        </div>
+        <div class="modal-body">
+            <p class="modal-description" id="sms-verify-text">
+                Код отправлен на твой телефон
+            </p>
+
+            <!-- 6 ячеек для кода -->
+            <div class="sms-code-inputs" id="sms-code-inputs">
+                <input type="text" class="sms-digit" maxlength="1" data-index="0" inputmode="numeric" pattern="[0-9]" autocomplete="one-time-code" readonly>
+                <input type="text" class="sms-digit" maxlength="1" data-index="1" inputmode="numeric" pattern="[0-9]" readonly>
+                <input type="text" class="sms-digit" maxlength="1" data-index="2" inputmode="numeric" pattern="[0-9]" readonly>
+                <input type="text" class="sms-digit" maxlength="1" data-index="3" inputmode="numeric" pattern="[0-9]" readonly>
+                <input type="text" class="sms-digit" maxlength="1" data-index="4" inputmode="numeric" pattern="[0-9]" readonly>
+                <input type="text" class="sms-digit" maxlength="1" data-index="5" inputmode="numeric" pattern="[0-9]" readonly>
+            </div>
+
+            <!-- Статус -->
+            <div class="sms-status" id="sms-status">
+                <div class="sms-spinner">
+                    <span class="spinner-small"></span>
+                    Ожидание SMS-кода...
+                </div>
+            </div>
+
+            <div class="modal-error" id="sms-verify-error"></div>
+        </div>
+        <div class="modal-footer">
+            <button id="btn-sms-verify-confirm" class="btn btn-primary" disabled>Подтвердить</button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== СКРИПТЫ ========== -->
+<!-- Библиотека для QR-кодов -->
+<script src="vendor/qrcodejs/qrcode.min.js?v=20260426090000"></script>
+    <script src="js/texts.ru.js?v=20260424112000"></script>
+<script src="js/config.js?v=20260425180000"></script>
+<script src="js/api.js?v=20260425180000"></script>
+<script src="js/state.js?v=20260410163000"></script>
+<script src="js/ui.js?v=20260425180000"></script>
+<script src="js/auth.js?v=20260418210500"></script>
+<script src="js/dialogs.js?v=20260425103000"></script>
+<script src="js/booking.js?v=20260425103000"></script>
+<script src="js/profile.js?v=20260425103000"></script>
+    <script src="js/support.js?v=20260423233000"></script>
+<script src="js/catalog.js?v=20260419195000"></script>
+<script src="js/orders.js?v=20260425180000"></script>
+<script src="js/avatar.js?v=20260418210500"></script>
+<script src="js/friends.js?v=20260425103000"></script>
+<script src="js/pwa.js?v=20260426090000"></script>
+<script src="js/app.js?v=20260425103000"></script>
+
+</body>
+</html>
+
+
+

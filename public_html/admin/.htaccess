@@ -1,0 +1,9 @@
+Options -Indexes
+Require all denied
+
+# Replace the deny rule with one of these protections before exposing admin:
+# Require ip 127.0.0.1
+# AuthType Basic
+# AuthName "BB Play Admin"
+# AuthUserFile /absolute/path/outside/public_html/.htpasswd
+# Require valid-user

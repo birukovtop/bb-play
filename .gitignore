@@ -1,0 +1,35 @@
+# Зависимости Node.js
+node_modules/
+
+# Android build artifacts
+android/build/
+android/.gradle/
+android/app/build/
+android/local.properties
+
+# Storage и логи
+storage/
+*.log
+
+# Конфиденциальные данные
+.env
+*.key
+*.jks
+*.p12
+config/local.php
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# TTS cache (опционально, если не хочешь грузить аудио)
+# public_html/api/tts_audio/
+
+# Capacitor
+capacitor.config.json

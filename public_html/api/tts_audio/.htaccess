@@ -1,0 +1,5 @@
+Options -Indexes
+
+<FilesMatch "\.py$">
+    Require all denied
+</FilesMatch>

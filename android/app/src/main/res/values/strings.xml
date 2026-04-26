@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">BBPlay</string>
+    <string name="title_activity_main">BBPlay</string>
+    <string name="package_name">ru.blackbearsplay.app</string>
+    <string name="custom_url_scheme">ru.blackbearsplay.app</string>
+</resources>

@@ -1,0 +1,24 @@
+{
+  "name": "blackbearsplay-mobile-shell",
+  "version": "1.0.0",
+  "private": true,
+  "description": "PWA and Capacitor shell for BlackBears Play.",
+  "scripts": {
+    "cap:sync": "npx cap sync",
+    "cap:add:android": "npx cap add android",
+    "cap:add:ios": "npx cap add ios",
+    "cap:open:android": "npx cap open android",
+    "cap:open:ios": "npx cap open ios"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.2.0",
+    "@capacitor/core": "^7.2.0",
+    "@capacitor/ios": "^7.2.0",
+    "qrcodejs": "^1.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/assets": "^3.0.5",
+    "@capacitor/cli": "^7.2.0",
+    "typescript": "^6.0.3"
+  }
+}

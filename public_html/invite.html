@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#0a0e1a">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="BlackBears Play">
+    <title>BlackBears Play — Приглашение</title>
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/pwa/icon-192.png">
+    <link rel="apple-touch-icon" href="assets/pwa/apple-touch-icon.png">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .invite-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            min-height: 100dvh;
+            padding: 20px;
+        }
+        .invite-container {
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+        .invite-bear {
+            font-size: 72px;
+            animation: float 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 20px rgba(245, 197, 66, 0.3));
+        }
+        .invite-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--gold), #ffdb6e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 12px 0 4px;
+        }
+        .invite-subtitle { color: var(--text-secondary); font-size: 0.95rem; }
+        .invite-sender { color: var(--neon-blue); font-weight: 700; }
+        .invite-bonus {
+            display: inline-block;
+            padding: 6px 16px;
+            background: var(--gold-glow);
+            border: 1px solid var(--gold-dim);
+            border-radius: 20px;
+            color: var(--gold);
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-top: 12px;
+        }
+        .invite-info {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="invite-screen">
+    <div class="invite-container">
+        <!-- Загрузка -->
+        <div id="invite-loading">
+            <div class="invite-bear">🐻</div>
+            <h1 class="invite-title">BlackBears Play</h1>
+            <p class="invite-subtitle">⏳ Проверяю приглашение...</p>
+        </div>
+
+        <!-- Ошибка -->
+        <div id="invite-error" class="hidden">
+            <div class="invite-bear">😿</div>
+            <h1 class="invite-title">Приглашение недействительно</h1>
+            <p class="invite-subtitle" id="invite-error-text">Ссылка истекла или уже использована.</p>
+            <a href="index.html" class="btn btn-primary" style="margin-top:20px;display:inline-flex;">🏠 Перейти к приложению</a>
+        </div>
+
+        <!-- Токен валиден -->
+        <div id="invite-ok" class="hidden">
+            <div class="invite-bear">🎉</div>
+            <h1 class="invite-title">Приглашение от</h1>
+            <p class="invite-subtitle"><span class="invite-sender" id="invite-sender-name">—</span></p>
+            <div class="invite-bonus">🪙 +50₽ бонус за регистрацию!</div>
+            <p class="invite-info" id="invite-expires">Действует до: —</p>
+            <a id="btn-go-register" class="btn btn-primary" style="margin-top:20px;display:inline-flex;">
+                ✅ Принять приглашение
+            </a>
+            <p class="invite-info" style="margin-top:16px;">или <a href="index.html" style="color:var(--text-secondary);">перейти к приложению без приглашения</a></p>
+        </div>
+    </div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/api.js"></script>
+<script src="js/pwa.js?v=20260426090000"></script>
+<script>
+    (async function() {
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get('token');
+
+        if (!token) {
+            showError('Токен приглашения не указан');
+            return;
+        }
+
+        try {
+            const data = await API.validateInvitation(token);
+
+            document.getElementById('invite-loading').classList.add('hidden');
+            document.getElementById('invite-ok').classList.remove('hidden');
+            document.getElementById('invite-sender-name').textContent = data.sender_name || data.sender_login;
+            document.getElementById('invite-expires').textContent = 'Действует до: ' + data.expires_at;
+
+            // Кнопка → index.html?invite=xxx
+            document.getElementById('btn-go-register').href = 'index.html?invite=' + encodeURIComponent(token);
+
+        } catch (e) {
+            showError(e.message);
+        }
+
+        function showError(msg) {
+            document.getElementById('invite-loading').classList.add('hidden');
+            document.getElementById('invite-error').classList.remove('hidden');
+            document.getElementById('invite-error-text').textContent = msg;
+        }
+    })();
+</script>
+
+</body>
+</html>

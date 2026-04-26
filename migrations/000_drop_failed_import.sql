@@ -1,0 +1,13 @@
+SET FOREIGN_KEY_CHECKS = 0;
+
+DROP TABLE IF EXISTS `food_order_items`;
+DROP TABLE IF EXISTS `balance_history`;
+DROP TABLE IF EXISTS `bookings`;
+DROP TABLE IF EXISTS `friendships`;
+DROP TABLE IF EXISTS `invitations`;
+DROP TABLE IF EXISTS `friend_bookings`;
+DROP TABLE IF EXISTS `food_orders`;
+DROP TABLE IF EXISTS `cafes`;
+DROP TABLE IF EXISTS `users`;
+
+SET FOREIGN_KEY_CHECKS = 1;
